@@ -1,0 +1,533 @@
+fileFormatVersion: 2
+guid: 5799d34ddab5d2048905d4e5b58a4934
+TextureImporter:
+  internalIDToNameTable:
+  - first:
+      213: 8952457009782794762
+    second: fotograma0006_0
+  - first:
+      213: -4137496199710421643
+    second: fotograma0006_1
+  - first:
+      213: -9036620455321532645
+    second: fotograma0006_2
+  - first:
+      213: -5357973481241759603
+    second: fotograma0006_3
+  - first:
+      213: 7125136853884252808
+    second: fotograma0006_4
+  - first:
+      213: -5026658458521502838
+    second: fotograma0006_5
+  - first:
+      213: -6463592260403319815
+    second: fotograma0006_6
+  - first:
+      213: -5552674560809721586
+    second: fotograma0006_7
+  - first:
+      213: -1132735910900647205
+    second: fotograma0006_8
+  - first:
+      213: 3332910816399207169
+    second: fotograma0006_9
+  - first:
+      213: -5460653959622378480
+    second: fotograma0006_10
+  - first:
+      213: -1947413592552712285
+    second: fotograma0006_11
+  - first:
+      213: -2142511248711363039
+    second: fotograma0006_12
+  - first:
+      213: -6786291881355957456
+    second: fotograma0006_13
+  - first:
+      213: 1276419520406357070
+    second: fotograma0006_14
+  - first:
+      213: 7587414283067064387
+    second: fotograma0006_15
+  externalObjects: {}
+  serializedVersion: 13
+  mipmaps:
+    mipMapMode: 0
+    enableMipMap: 0
+    sRGBTexture: 1
+    linearTexture: 0
+    fadeOut: 0
+    borderMipMap: 0
+    mipMapsPreserveCoverage: 0
+    alphaTestReferenceValue: 0.5
+    mipMapFadeDistanceStart: 1
+    mipMapFadeDistanceEnd: 3
+  bumpmap:
+    convertToNormalMap: 0
+    externalNormalMap: 0
+    heightScale: 0.25
+    normalMapFilter: 0
+    flipGreenChannel: 0
+  isReadable: 0
+  streamingMipmaps: 0
+  streamingMipmapsPriority: 0
+  vTOnly: 0
+  ignoreMipmapLimit: 0
+  grayScaleToAlpha: 0
+  generateCubemap: 6
+  cubemapConvolution: 0
+  seamlessCubemap: 0
+  textureFormat: 1
+  maxTextureSize: 2048
+  textureSettings:
+    serializedVersion: 2
+    filterMode: 1
+    aniso: 1
+    mipBias: 0
+    wrapU: 1
+    wrapV: 1
+    wrapW: 1
+  nPOTScale: 0
+  lightmap: 0
+  compressionQuality: 50
+  spriteMode: 2
+  spriteExtrude: 1
+  spriteMeshType: 1
+  alignment: 0
+  spritePivot: {x: 0.5, y: 0.5}
+  spritePixelsToUnits: 100
+  spriteBorder: {x: 0, y: 0, z: 0, w: 0}
+  spriteGenerateFallbackPhysicsShape: 1
+  alphaUsage: 1
+  alphaIsTransparency: 1
+  spriteTessellationDetail: -1
+  textureType: 8
+  textureShape: 1
+  singleChannelComponent: 0
+  flipbookRows: 1
+  flipbookColumns: 1
+  maxTextureSizeSet: 0
+  compressionQualitySet: 0
+  textureFormatSet: 0
+  ignorePngGamma: 0
+  applyGammaDecoding: 0
+  swizzle: 50462976
+  cookieLightType: 0
+  platformSettings:
+  - serializedVersion: 4
+    buildTarget: DefaultTexturePlatform
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: Standalone
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  spriteSheet:
+    serializedVersion: 2
+    sprites:
+    - serializedVersion: 2
+      name: fotograma0006_0
+      rect:
+        serializedVersion: 2
+        x: 212
+        y: 1114
+        width: 3595
+        height: 2535
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: a0a2f0fd7348d3c70800000000000000
+      internalID: 8952457009782794762
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: fotograma0006_1
+      rect:
+        serializedVersion: 2
+        x: 3751
+        y: 3507
+        width: 39
+        height: 111
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 57d4bb4b029a496c0800000000000000
+      internalID: -4137496199710421643
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: fotograma0006_2
+      rect:
+        serializedVersion: 2
+        x: 3790
+        y: 3284
+        width: 6
+        height: 38
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: b17088ee299779280800000000000000
+      internalID: -9036620455321532645
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: fotograma0006_3
+      rect:
+        serializedVersion: 2
+        x: 3782
+        y: 3254
+        width: 8
+        height: 12
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: d803f9ea187a4a5b0800000000000000
+      internalID: -5357973481241759603
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: fotograma0006_4
+      rect:
+        serializedVersion: 2
+        x: 3786
+        y: 3245
+        width: 7
+        height: 9
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 882b0dfc73291e260800000000000000
+      internalID: 7125136853884252808
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: fotograma0006_5
+      rect:
+        serializedVersion: 2
+        x: 666
+        y: 1086
+        width: 46
+        height: 29
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: a8bfc9ca3c8bd3ab0800000000000000
+      internalID: -5026658458521502838
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: fotograma0006_6
+      rect:
+        serializedVersion: 2
+        x: 708
+        y: 1093
+        width: 71
+        height: 29
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 9fb22b1b515bc46a0800000000000000
+      internalID: -6463592260403319815
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: fotograma0006_7
+      rect:
+        serializedVersion: 2
+        x: 769
+        y: 1107
+        width: 62
+        height: 23
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: e01a69108efe0f2b0800000000000000
+      internalID: -5552674560809721586
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: fotograma0006_8
+      rect:
+        serializedVersion: 2
+        x: 842
+        y: 1105
+        width: 23
+        height: 14
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: bda3076c0b6b740f0800000000000000
+      internalID: -1132735910900647205
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: fotograma0006_9
+      rect:
+        serializedVersion: 2
+        x: 567
+        y: 1072
+        width: 28
+        height: 22
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 10b288f9ab0e04e20800000000000000
+      internalID: 3332910816399207169
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: fotograma0006_10
+      rect:
+        serializedVersion: 2
+        x: 606
+        y: 1076
+        width: 37
+        height: 23
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 01cb06fc72cd734b0800000000000000
+      internalID: -5460653959622378480
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: fotograma0006_11
+      rect:
+        serializedVersion: 2
+        x: 631
+        y: 1082
+        width: 21
+        height: 24
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 3a7d029c7a569f4e0800000000000000
+      internalID: -1947413592552712285
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: fotograma0006_12
+      rect:
+        serializedVersion: 2
+        x: 653
+        y: 1081
+        width: 31
+        height: 24
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 126d74dee554442e0800000000000000
+      internalID: -2142511248711363039
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: fotograma0006_13
+      rect:
+        serializedVersion: 2
+        x: 714
+        y: 1090
+        width: 11
+        height: 7
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 03b29ad3d7f32d1a0800000000000000
+      internalID: -6786291881355957456
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: fotograma0006_14
+      rect:
+        serializedVersion: 2
+        x: 510
+        y: 1069
+        width: 21
+        height: 13
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: e4402328ac0c6b110800000000000000
+      internalID: 1276419520406357070
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: fotograma0006_15
+      rect:
+        serializedVersion: 2
+        x: 548
+        y: 1070
+        width: 25
+        height: 19
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 34000f13719eb4960800000000000000
+      internalID: 7587414283067064387
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    outline: []
+    customData: 
+    physicsShape: []
+    bones: []
+    spriteID: 
+    internalID: 0
+    vertices: []
+    indices: 
+    edges: []
+    weights: []
+    secondaryTextures: []
+    spriteCustomMetadata:
+      entries: []
+    nameFileIdTable:
+      fotograma0006_0: 8952457009782794762
+      fotograma0006_1: -4137496199710421643
+      fotograma0006_10: -5460653959622378480
+      fotograma0006_11: -1947413592552712285
+      fotograma0006_12: -2142511248711363039
+      fotograma0006_13: -6786291881355957456
+      fotograma0006_14: 1276419520406357070
+      fotograma0006_15: 7587414283067064387
+      fotograma0006_2: -9036620455321532645
+      fotograma0006_3: -5357973481241759603
+      fotograma0006_4: 7125136853884252808
+      fotograma0006_5: -5026658458521502838
+      fotograma0006_6: -6463592260403319815
+      fotograma0006_7: -5552674560809721586
+      fotograma0006_8: -1132735910900647205
+      fotograma0006_9: 3332910816399207169
+  mipmapLimitGroupName: 
+  pSDRemoveMatte: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

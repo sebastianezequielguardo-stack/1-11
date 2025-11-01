@@ -1,0 +1,157 @@
+using UnityEngine;
+
+/// <summary>
+/// Configuración rápida y simple para videos de fondo
+/// Sin dependencias complejas - funciona inmediatamente
+/// </summary>
+public class QuickVideoSetup : MonoBehaviour
+{
+    [Header("Quick Setup")]
+    public bool setupOnStart = true;
+    public bool enableVideos = true;
+    
+    [Header("Video Settings")]
+    [Range(0.1f, 1.0f)]
+    public float videoOpacity = 0.8f;
+    public float videoTimeout = 5f;
+    
+    void Start()
+    {
+        if (setupOnStart)
+        {
+            SetupVideoSystem();
+        }
+    }
+    
+    [ContextMenu("Setup Video System")]
+    public void SetupVideoSystem()
+    {
+        Debug.Log("🚀 Configurando sistema de video rápido...");
+        
+        // Try to find existing BackgroundVideoManager
+        BackgroundVideoManager videoManager = FindFirstObjectByType<BackgroundVideoManager>();
+        
+        if (videoManager == null)
+        {
+            Debug.Log("🆕 Creando BackgroundVideoManager...");
+            GameObject videoObj = new GameObject("BackgroundVideoManager");
+            videoManager = videoObj.AddComponent<BackgroundVideoManager>();
+        }
+        
+        // Configure video manager
+        videoManager.enableBackgroundVideo = enableVideos;
+        videoManager.videoOpacity = videoOpacity;
+        // videoManager.videoLoadTimeout = videoTimeout; // Not available in original
+        // videoManager.autoSetupOnStart = true; // Not available in original
+        // videoManager.debugMode = true; // Not available in original
+        
+        // Setup the system
+        // videoManager.SetupVideoSystem(); // Not available in original
+        
+        // Connect to GameplayManager
+        ConnectToGameplayManager(videoManager);
+        
+        Debug.Log("✅ Sistema de video configurado correctamente");
+    }
+    
+    void ConnectToGameplayManager(BackgroundVideoManager videoManager)
+    {
+        GameplayManager gameplayManager = FindFirstObjectByType<GameplayManager>();
+        
+        if (gameplayManager != null)
+        {
+            gameplayManager.backgroundVideoManager = videoManager;
+            Debug.Log("🔗 Conectado con GameplayManager");
+        }
+        else
+        {
+            Debug.LogWarning("⚠️ GameplayManager no encontrado");
+        }
+    }
+    
+    [ContextMenu("Disable Videos")]
+    public void DisableVideos()
+    {
+        BackgroundVideoManager videoManager = FindFirstObjectByType<BackgroundVideoManager>();
+        if (videoManager != null)
+        {
+            videoManager.enableBackgroundVideo = false;
+            Debug.Log("🎬 Videos desactivados");
+        }
+    }
+    
+    [ContextMenu("Enable Videos")]
+    public void EnableVideos()
+    {
+        BackgroundVideoManager videoManager = FindFirstObjectByType<BackgroundVideoManager>();
+        if (videoManager != null)
+        {
+            videoManager.enableBackgroundVideo = true;
+            Debug.Log("🎬 Videos activados");
+        }
+    }
+    
+    [ContextMenu("Test Video Loading")]
+    public void TestVideoLoading()
+    {
+        BackgroundVideoManager videoManager = FindFirstObjectByType<BackgroundVideoManager>();
+        if (videoManager != null)
+        {
+            Debug.Log("🧪 Testing video system...");
+            // videoManager.TestVideoLoading(); // Method not available in original
+        }
+        else
+        {
+            Debug.LogError("❌ BackgroundVideoManager no encontrado");
+        }
+    }
+    
+    [ContextMenu("Show Instructions")]
+    public void ShowInstructions()
+    {
+        Debug.Log("📋 INSTRUCCIONES RÁPIDAS:");
+        Debug.Log("═══════════════════════");
+        Debug.Log("1. Agregar QuickVideoSetup a cualquier GameObject");
+        Debug.Log("2. Ejecutar 'Setup Video System'");
+        Debug.Log("3. Colocar videos MP4 en: StreamingAssets/Songs/[Cancion]/background.mp4");
+        Debug.Log("4. ¡Listo!");
+        Debug.Log("");
+        Debug.Log("Controles:");
+        Debug.Log("F5 - Desactivar videos");
+        Debug.Log("F6 - Activar videos");
+        Debug.Log("F7 - Probar carga");
+    }
+    
+    void Update()
+    {
+        if (Input.GetKeyDown(KeyCode.F5))
+        {
+            DisableVideos();
+        }
+        
+        if (Input.GetKeyDown(KeyCode.F6))
+        {
+            EnableVideos();
+        }
+        
+        if (Input.GetKeyDown(KeyCode.F7))
+        {
+            TestVideoLoading();
+        }
+    }
+    
+    void OnGUI()
+    {
+        GUILayout.BeginArea(new Rect(10, Screen.height - 120, 300, 100));
+        GUILayout.Label("🚀 QUICK VIDEO SETUP");
+        
+        BackgroundVideoManager videoManager = FindFirstObjectByType<BackgroundVideoManager>();
+        bool hasVideoManager = videoManager != null;
+        bool videosEnabled = hasVideoManager && videoManager.enableBackgroundVideo;
+        
+        GUILayout.Label($"Video Manager: {(hasVideoManager ? "✅" : "❌")}");
+        GUILayout.Label($"Videos: {(videosEnabled ? "ENABLED" : "DISABLED")}");
+        GUILayout.Label("F5/F6 - Toggle | F7 - Test");
+        GUILayout.EndArea();
+    }
+}

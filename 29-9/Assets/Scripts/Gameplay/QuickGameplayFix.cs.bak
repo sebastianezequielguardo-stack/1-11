@@ -1,0 +1,179 @@
+using UnityEngine;
+
+/// <summary>
+/// Script para solucionar problemas de carga lenta del gameplay
+/// Permite desactivar videos temporalmente para testing rápido
+/// </summary>
+public class QuickGameplayFix : MonoBehaviour
+{
+    [Header("Quick Fixes")]
+    public bool disableVideosForFastLoading = true;
+    public bool skipVideoTimeout = true;
+    public float quickVideoTimeout = 3f; // Timeout más corto para testing
+    
+    [Header("Performance")]
+    public bool optimizeVideoSettings = true;
+    public bool showLoadingInfo = true;
+    
+    void Start()
+    {
+        if (disableVideosForFastLoading || skipVideoTimeout)
+        {
+            ApplyQuickFixes();
+        }
+    }
+    
+    [ContextMenu("Apply Quick Fixes")]
+    public void ApplyQuickFixes()
+    {
+        Debug.Log("🚀 Aplicando correcciones rápidas para gameplay...");
+        
+        if (disableVideosForFastLoading)
+        {
+            DisableVideosTemporarily();
+        }
+        
+        if (skipVideoTimeout)
+        {
+            SetQuickVideoTimeout();
+        }
+        
+        if (optimizeVideoSettings)
+        {
+            OptimizeVideoSettings();
+        }
+        
+        Debug.Log("✅ Correcciones rápidas aplicadas");
+    }
+    
+    void DisableVideosTemporarily()
+    {
+        BackgroundVideoManager videoManager = FindFirstObjectByType<BackgroundVideoManager>();
+        if (videoManager != null)
+        {
+            videoManager.enableBackgroundVideo = false;
+            Debug.Log("🎬 Videos desactivados temporalmente para carga rápida");
+        }
+    }
+    
+    void SetQuickVideoTimeout()
+    {
+        BackgroundVideoManager videoManager = FindFirstObjectByType<BackgroundVideoManager>();
+        if (videoManager != null)
+        {
+            videoManager.videoLoadTimeout = quickVideoTimeout;
+            videoManager.skipVideoOnTimeout = true;
+            Debug.Log($"⏱️ Timeout de video reducido a {quickVideoTimeout}s");
+        }
+    }
+    
+    void OptimizeVideoSettings()
+    {
+        BackgroundVideoManager videoManager = FindFirstObjectByType<BackgroundVideoManager>();
+        if (videoManager != null)
+        {
+            // Configuración optimizada para carga rápida
+            videoManager.videoOpacity = 0.6f; // Menos intenso
+            Debug.Log("⚡ Configuración de video optimizada");
+        }
+    }
+    
+    [ContextMenu("Enable Videos")]
+    public void EnableVideos()
+    {
+        BackgroundVideoManager videoManager = FindFirstObjectByType<BackgroundVideoManager>();
+        if (videoManager != null)
+        {
+            videoManager.enableBackgroundVideo = true;
+            videoManager.videoLoadTimeout = 10f; // Timeout normal
+            Debug.Log("🎬 Videos reactivados");
+        }
+    }
+    
+    [ContextMenu("Disable Videos")]
+    public void DisableVideos()
+    {
+        BackgroundVideoManager videoManager = FindFirstObjectByType<BackgroundVideoManager>();
+        if (videoManager != null)
+        {
+            videoManager.enableBackgroundVideo = false;
+            Debug.Log("🎬 Videos desactivados");
+        }
+    }
+    
+    [ContextMenu("Test Gameplay Loading")]
+    public void TestGameplayLoading()
+    {
+        Debug.Log("🧪 Iniciando test de carga de gameplay...");
+        
+        // Desactivar videos temporalmente
+        DisableVideosTemporarily();
+        
+        // Verificar componentes necesarios
+        GameplayManager gameplayManager = FindFirstObjectByType<GameplayManager>();
+        if (gameplayManager != null)
+        {
+            Debug.Log("✅ GameplayManager encontrado");
+        }
+        else
+        {
+            Debug.LogError("❌ GameplayManager no encontrado");
+        }
+        
+        // Verificar audio source
+        AudioSource audioSource = FindFirstObjectByType<AudioSource>();
+        if (audioSource != null)
+        {
+            Debug.Log("✅ AudioSource encontrado");
+        }
+        else
+        {
+            Debug.LogWarning("⚠️ AudioSource no encontrado");
+        }
+        
+        Debug.Log("🧪 Test completado - Revisa la consola para detalles");
+    }
+    
+    void Update()
+    {
+        // Teclas de acceso rápido
+        if (Input.GetKeyDown(KeyCode.F5))
+        {
+            DisableVideos();
+        }
+        
+        if (Input.GetKeyDown(KeyCode.F6))
+        {
+            EnableVideos();
+        }
+        
+        if (Input.GetKeyDown(KeyCode.F7))
+        {
+            TestGameplayLoading();
+        }
+    }
+    
+    void OnGUI()
+    {
+        if (!showLoadingInfo) return;
+        
+        GUILayout.BeginArea(new Rect(Screen.width - 250, 10, 240, 150));
+        GUILayout.Label("🚀 QUICK GAMEPLAY FIX");
+        
+        BackgroundVideoManager videoManager = FindFirstObjectByType<BackgroundVideoManager>();
+        bool videosEnabled = videoManager?.enableBackgroundVideo ?? false;
+        
+        GUILayout.Label($"Videos: {(videosEnabled ? "ENABLED" : "DISABLED")}");
+        
+        if (videoManager != null)
+        {
+            GUILayout.Label($"Timeout: {videoManager.videoLoadTimeout:F1}s");
+        }
+        
+        GUILayout.Label("");
+        GUILayout.Label("F5 - Disable Videos");
+        GUILayout.Label("F6 - Enable Videos");
+        GUILayout.Label("F7 - Test Loading");
+        GUILayout.EndArea();
+    }
+}

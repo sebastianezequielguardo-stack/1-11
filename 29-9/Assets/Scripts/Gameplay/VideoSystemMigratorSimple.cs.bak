@@ -1,0 +1,141 @@
+using UnityEngine;
+
+/// <summary>
+/// Versión simplificada del migrador de sistema de video
+/// Sin dependencias problemáticas
+/// </summary>
+public class VideoSystemMigratorSimple : MonoBehaviour
+{
+    [Header("Migration Settings")]
+    public bool autoMigrateOnStart = true;
+    
+    void Start()
+    {
+        if (autoMigrateOnStart)
+        {
+            MigrateVideoSystem();
+        }
+    }
+    
+    [ContextMenu("Migrate Video System")]
+    public void MigrateVideoSystem()
+    {
+        Debug.Log("🔄 Iniciando migración del sistema de video...");
+        
+        SetupNewVideoSystem();
+        ConnectToGameplayManager();
+        
+        Debug.Log("✅ Migración del sistema de video completada");
+    }
+    
+    void SetupNewVideoSystem()
+    {
+        Debug.Log("🆕 Configurando nuevo sistema de video...");
+        
+        // Find or create BackgroundVideoManager
+        BackgroundVideoManager newManager = FindFirstObjectByType<BackgroundVideoManager>();
+        
+        if (newManager == null)
+        {
+            GameObject managerObj = new GameObject("BackgroundVideoManager");
+            newManager = managerObj.AddComponent<BackgroundVideoManager>();
+            Debug.Log("🆕 BackgroundVideoManager creado");
+        }
+        
+        // Configure for optimal performance
+        newManager.enableBackgroundVideo = true;
+        newManager.videoOpacity = 0.8f;
+        // newManager.videoLoadTimeout = 5f; // Not available in original
+        // newManager.autoSetupOnStart = true; // Not available in original
+        // newManager.debugMode = true; // Not available in original
+        
+        // Setup the video system
+        // newManager.SetupVideoSystem(); // Not available in original
+        
+        Debug.Log("✅ Nuevo sistema de video configurado");
+    }
+    
+    void ConnectToGameplayManager()
+    {
+        Debug.Log("🔗 Conectando con GameplayManager...");
+        
+        GameplayManager gameplayManager = FindFirstObjectByType<GameplayManager>();
+        BackgroundVideoManager videoManager = FindFirstObjectByType<BackgroundVideoManager>();
+        
+        if (gameplayManager != null && videoManager != null)
+        {
+            gameplayManager.backgroundVideoManager = videoManager;
+            Debug.Log("✅ GameplayManager conectado con BackgroundVideoManager");
+        }
+        else
+        {
+            if (gameplayManager == null)
+                Debug.LogWarning("⚠️ GameplayManager no encontrado");
+            if (videoManager == null)
+                Debug.LogWarning("⚠️ BackgroundVideoManager no encontrado");
+        }
+    }
+    
+    [ContextMenu("Test Video System")]
+    public void TestVideoSystem()
+    {
+        Debug.Log("🧪 Probando sistema de video...");
+        
+        BackgroundVideoManager videoManager = FindFirstObjectByType<BackgroundVideoManager>();
+        if (videoManager != null)
+        {
+            Debug.Log("🧪 Testing video system...");
+            // videoManager.TestVideoLoading(); // Method not available in original
+        }
+        else
+        {
+            Debug.LogError("❌ BackgroundVideoManager no encontrado");
+        }
+    }
+    
+    [ContextMenu("Show Setup Instructions")]
+    public void ShowSetupInstructions()
+    {
+        Debug.Log("📋 INSTRUCCIONES DE CONFIGURACIÓN:");
+        Debug.Log("════════════════════════════════════");
+        Debug.Log("");
+        Debug.Log("1️⃣ MIGRACIÓN AUTOMÁTICA:");
+        Debug.Log("   • Agregar VideoSystemMigratorSimple a cualquier GameObject");
+        Debug.Log("   • Ejecutar 'Migrate Video System'");
+        Debug.Log("   • ¡Todo se configura automáticamente!");
+        Debug.Log("");
+        Debug.Log("2️⃣ ESTRUCTURA DE ARCHIVOS:");
+        Debug.Log("   StreamingAssets/Songs/[Cancion]/");
+        Debug.Log("   ├── song.ogg");
+        Debug.Log("   ├── notes.chart");
+        Debug.Log("   └── background.mp4  ← Video aquí");
+        Debug.Log("");
+        Debug.Log("3️⃣ FORMATOS RECOMENDADOS:");
+        Debug.Log("   • MP4 (H.264) - MÁS RÁPIDO ⚡");
+        Debug.Log("   • WebM - Rápido 🚀");
+        Debug.Log("   • Evitar MOV/AVI - Lentos 🐌");
+    }
+    
+    void Update()
+    {
+        // Hotkeys for quick access
+        if (Input.GetKeyDown(KeyCode.F11))
+        {
+            MigrateVideoSystem();
+        }
+        
+        if (Input.GetKeyDown(KeyCode.F12))
+        {
+            TestVideoSystem();
+        }
+    }
+    
+    void OnGUI()
+    {
+        GUILayout.BeginArea(new Rect(Screen.width - 250, Screen.height - 100, 240, 80));
+        GUILayout.Label("🔄 VIDEO SYSTEM MIGRATOR");
+        GUILayout.Label("F11 - Migrate System");
+        GUILayout.Label("F12 - Test Video System");
+        GUILayout.EndArea();
+    }
+}

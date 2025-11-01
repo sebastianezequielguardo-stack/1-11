@@ -1,0 +1,244 @@
+using UnityEngine;
+using System.IO;
+
+/// <summary>
+/// Helper script para configurar videos de fondo fácilmente
+/// Proporciona información sobre cómo organizar los archivos WebM
+/// OBSOLETO: Usar SimpleVideoFix en su lugar
+/// </summary>
+[System.Obsolete("Use SimpleVideoFix instead")]
+public class VideoSetupHelper : MonoBehaviour
+{
+    [Header("Video Configuration")]
+    public bool showVideoInfo = true;
+    public bool autoSetupBackgroundVideo = true;
+    
+    [Header("Video Settings")]
+    [Range(0.1f, 1.0f)]
+    public float videoOpacity = 0.8f; // Slightly dimmed for better highway visibility
+    public Vector3 videoPosition = new Vector3(0f, 0f, 80f); // Far behind everything
+    public Vector3 videoScale = new Vector3(50f, 35f, 1f); // Cover entire screen
+    
+    private BackgroundVideoManager backgroundVideoManager;
+    
+    void Start()
+    {
+        if (autoSetupBackgroundVideo)
+        {
+            SetupBackgroundVideo();
+        }
+        
+        if (showVideoInfo)
+        {
+            ShowVideoSetupInfo();
+        }
+    }
+    
+    [ContextMenu("Setup Background Video")]
+    public void SetupBackgroundVideo()
+    {
+        // Find or create BackgroundVideoManager
+        backgroundVideoManager = FindFirstObjectByType<BackgroundVideoManager>();
+        
+        if (backgroundVideoManager == null)
+        {
+            GameObject videoManagerObj = new GameObject("BackgroundVideoManager");
+            backgroundVideoManager = videoManagerObj.AddComponent<BackgroundVideoManager>();
+            Debug.Log("🎬 BackgroundVideoManager creado automáticamente");
+        }
+        
+        // Configure video settings
+        backgroundVideoManager.enableBackgroundVideo = true;
+        backgroundVideoManager.videoOpacity = videoOpacity;
+        backgroundVideoManager.videoPosition = videoPosition;
+        backgroundVideoManager.videoScale = videoScale;
+        
+        // Ensure GameplayManager has reference
+        GameplayManager gameplayManager = FindFirstObjectByType<GameplayManager>();
+        if (gameplayManager != null)
+        {
+            // gameplayManager.backgroundVideoManager = backgroundVideoManager; // DISABLED - Type mismatch
+            Debug.Log("⚠️ GameplayManager connection disabled - use SimpleVideoFix instead");
+        }
+        
+        Debug.Log("🎬 Background Video configurado correctamente");
+    }
+    
+    [ContextMenu("Show Video Setup Info")]
+    public void ShowVideoSetupInfo()
+    {
+        Debug.Log("📋 CONFIGURACIÓN DE VIDEOS DE FONDO:");
+        Debug.Log("════════════════════════════════════");
+        
+        string songsPath = Path.Combine(Application.streamingAssetsPath, "Songs");
+        Debug.Log($"📁 Carpeta de canciones: {songsPath}");
+        
+        Debug.Log("\n🎬 FORMATOS DE VIDEO SOPORTADOS:");
+        Debug.Log("   • WebM (Recomendado)");
+        Debug.Log("   • MP4");
+        Debug.Log("   • MOV");
+        Debug.Log("   • AVI");
+        
+        Debug.Log("\n📂 ESTRUCTURA DE CARPETAS:");
+        Debug.Log("   StreamingAssets/");
+        Debug.Log("   └── Songs/");
+        Debug.Log("       └── [NombreCancion]/");
+        Debug.Log("           ├── song.ogg");
+        Debug.Log("           ├── notes.chart");
+        Debug.Log("           └── background.webm  ← Tu video aquí");
+        
+        Debug.Log("\n🎯 NOMBRES DE ARCHIVO VÁLIDOS:");
+        Debug.Log("   • background.webm");
+        Debug.Log("   • video.webm");
+        Debug.Log("   • bg.webm");
+        Debug.Log("   • movie.webm");
+        Debug.Log("   • Cualquier archivo .webm en la carpeta");
+        
+        Debug.Log("\n⚙️ CONFIGURACIÓN ACTUAL:");
+        Debug.Log($"   • Opacidad: {videoOpacity}");
+        Debug.Log($"   • Posición: {videoPosition}");
+        Debug.Log($"   • Escala: {videoScale}");
+        
+        // Check existing songs
+        CheckExistingSongs();
+    }
+    
+    void CheckExistingSongs()
+    {
+        string songsPath = Path.Combine(Application.streamingAssetsPath, "Songs");
+        
+        if (!Directory.Exists(songsPath))
+        {
+            Debug.LogWarning("⚠️ Carpeta Songs no encontrada");
+            return;
+        }
+        
+        string[] songFolders = Directory.GetDirectories(songsPath);
+        Debug.Log($"\n🎵 CANCIONES ENCONTRADAS ({songFolders.Length}):");
+        
+        foreach (string folder in songFolders)
+        {
+            string songName = Path.GetFileName(folder);
+            bool hasVideo = CheckForVideo(folder);
+            string videoStatus = hasVideo ? "✅ CON VIDEO" : "❌ SIN VIDEO";
+            
+            Debug.Log($"   • {songName} - {videoStatus}");
+            
+            if (hasVideo)
+            {
+                string[] videoFiles = Directory.GetFiles(folder, "*.webm");
+                if (videoFiles.Length == 0)
+                {
+                    videoFiles = Directory.GetFiles(folder, "*.mp4");
+                }
+                if (videoFiles.Length > 0)
+                {
+                    string videoFile = Path.GetFileName(videoFiles[0]);
+                    Debug.Log($"     └── Video: {videoFile}");
+                }
+            }
+        }
+    }
+    
+    bool CheckForVideo(string songFolder)
+    {
+        string[] extensions = { "*.webm", "*.mp4", "*.mov", "*.avi" };
+        
+        foreach (string extension in extensions)
+        {
+            string[] files = Directory.GetFiles(songFolder, extension);
+            if (files.Length > 0)
+            {
+                return true;
+            }
+        }
+        
+        return false;
+    }
+    
+    [ContextMenu("Test Video Loading")]
+    public void TestVideoLoading()
+    {
+        if (GameManager.Instance == null || string.IsNullOrEmpty(GameManager.Instance.selectedSongPath))
+        {
+            Debug.LogWarning("⚠️ No hay canción seleccionada para probar");
+            return;
+        }
+        
+        string songFolder = Path.Combine(Application.streamingAssetsPath, "Songs", GameManager.Instance.selectedSongPath);
+        
+        if (backgroundVideoManager == null)
+        {
+            SetupBackgroundVideo();
+        }
+        
+        backgroundVideoManager.LoadSongVideo(songFolder);
+        Debug.Log($"🎬 Probando carga de video para: {GameManager.Instance.selectedSongPath}");
+    }
+    
+    [ContextMenu("Create Example Song Structure")]
+    public void CreateExampleSongStructure()
+    {
+        string songsPath = Path.Combine(Application.streamingAssetsPath, "Songs");
+        string examplePath = Path.Combine(songsPath, "EjemploCancion");
+        
+        if (!Directory.Exists(examplePath))
+        {
+            Directory.CreateDirectory(examplePath);
+            
+            // Create example files info
+            string infoPath = Path.Combine(examplePath, "README.txt");
+            string infoContent = @"ESTRUCTURA DE ARCHIVOS PARA VIDEOS DE FONDO:
+
+Archivos requeridos:
+- song.ogg (audio de la canción)
+- notes.chart (notas del juego)
+
+Archivo de video (opcional):
+- background.webm (video de fondo)
+- video.webm (alternativo)
+- bg.webm (alternativo)
+- movie.webm (alternativo)
+
+Formatos soportados: .webm, .mp4, .mov, .avi
+Recomendado: WebM para mejor compatibilidad
+
+El video se reproducirá automáticamente durante el gameplay.
+";
+            
+            File.WriteAllText(infoPath, infoContent);
+            Debug.Log($"📁 Estructura de ejemplo creada en: {examplePath}");
+            Debug.Log("📝 Lee el archivo README.txt para más información");
+        }
+        else
+        {
+            Debug.Log("📁 La carpeta de ejemplo ya existe");
+        }
+    }
+    
+    void Update()
+    {
+        // Teclas de acceso rápido para testing
+        if (Input.GetKeyDown(KeyCode.V))
+        {
+            TestVideoLoading();
+        }
+        
+        if (Input.GetKeyDown(KeyCode.I))
+        {
+            ShowVideoSetupInfo();
+        }
+    }
+    
+    void OnGUI()
+    {
+        if (!showVideoInfo) return;
+        
+        GUILayout.BeginArea(new Rect(10, Screen.height - 120, 400, 100));
+        GUILayout.Label("🎬 VIDEO SETUP HELPER");
+        GUILayout.Label("V - Test video loading");
+        GUILayout.Label("I - Show setup info");
+        GUILayout.Label($"Videos: {(backgroundVideoManager?.enableBackgroundVideo == true ? "ENABLED" : "DISABLED")}");
+        GUILayout.EndArea();
+    }
+}

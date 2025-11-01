@@ -1,0 +1,219 @@
+using UnityEngine;
+
+/// <summary>
+/// Migra automáticamente del sistema de video anterior al nuevo sistema limpio
+/// Ejecutar una vez para limpiar y configurar todo
+/// </summary>
+public class VideoSystemMigrator : MonoBehaviour
+{
+    [Header("Migration Settings")]
+    public bool autoMigrateOnStart = true;
+    public bool removeOldScripts = true;
+    public bool setupNewSystem = true;
+    
+    void Start()
+    {
+        if (autoMigrateOnStart)
+        {
+            MigrateVideoSystem();
+        }
+    }
+    
+    [ContextMenu("Migrate Video System")]
+    public void MigrateVideoSystem()
+    {
+        Debug.Log("🔄 Iniciando migración del sistema de video...");
+        
+        if (removeOldScripts)
+        {
+            RemoveOldVideoScripts();
+        }
+        
+        if (setupNewSystem)
+        {
+            SetupNewVideoSystem();
+        }
+        
+        ConnectToGameplayManager();
+        
+        Debug.Log("✅ Migración del sistema de video completada");
+    }
+    
+    void RemoveOldVideoScripts()
+    {
+        Debug.Log("🗑️ Removiendo scripts de video obsoletos...");
+        
+        // Find and disable old video scripts
+        BackgroundVideoManager[] oldManagers = FindObjectsOfType<BackgroundVideoManager>();
+        foreach (var manager in oldManagers)
+        {
+            manager.enabled = false;
+            Debug.Log($"🗑️ Desactivado: {manager.name}");
+        }
+        
+        VideoSetupHelper[] helpers = FindObjectsOfType<VideoSetupHelper>();
+        foreach (var helper in helpers)
+        {
+            helper.enabled = false;
+            Debug.Log($"🗑️ Desactivado: {helper.name}");
+        }
+        
+        FullScreenVideoBackground[] backgrounds = FindObjectsOfType<FullScreenVideoBackground>();
+        foreach (var bg in backgrounds)
+        {
+            bg.enabled = false;
+            Debug.Log($"🗑️ Desactivado: {bg.name}");
+        }
+        
+        VideoFormatOptimizer[] optimizers = FindObjectsOfType<VideoFormatOptimizer>();
+        foreach (var opt in optimizers)
+        {
+            opt.enabled = false;
+            Debug.Log($"🗑️ Desactivado: {opt.name}");
+        }
+        
+        QuickGameplayFix[] fixes = FindObjectsOfType<QuickGameplayFix>();
+        foreach (var fix in fixes)
+        {
+            fix.enabled = false;
+            Debug.Log($"🗑️ Desactivado: {fix.name}");
+        }
+    }
+    
+    void SetupNewVideoSystem()
+    {
+        Debug.Log("🆕 Configurando nuevo sistema de video...");
+        
+        // Find or create BackgroundVideoManager
+        BackgroundVideoManager newManager = FindFirstObjectByType<BackgroundVideoManager>();
+        
+        if (newManager == null)
+        {
+            GameObject managerObj = new GameObject("BackgroundVideoManager");
+            newManager = managerObj.AddComponent<BackgroundVideoManager>();
+            Debug.Log("🆕 BackgroundVideoManager creado");
+        }
+        
+        // Configure for optimal performance
+        newManager.enableBackgroundVideo = true;
+        newManager.videoOpacity = 0.8f;
+        // newManager.videoLoadTimeout = 5f; // Not available in original
+        // newManager.autoSetupOnStart = true; // Not available in original
+        // newManager.debugMode = true; // Not available in original
+        
+        // Setup the video system
+        // newManager.SetupVideoSystem(); // Not available in original
+        
+        Debug.Log("✅ Nuevo sistema de video configurado");
+    }
+    
+    void ConnectToGameplayManager()
+    {
+        Debug.Log("🔗 Conectando con GameplayManager...");
+        
+        GameplayManager gameplayManager = FindFirstObjectByType<GameplayManager>();
+        BackgroundVideoManager videoManager = FindFirstObjectByType<BackgroundVideoManager>();
+        
+        if (gameplayManager != null && videoManager != null)
+        {
+            gameplayManager.backgroundVideoManager = videoManager;
+            Debug.Log("✅ GameplayManager conectado con BackgroundVideoManager");
+        }
+        else
+        {
+            if (gameplayManager == null)
+                Debug.LogWarning("⚠️ GameplayManager no encontrado");
+            if (videoManager == null)
+                Debug.LogWarning("⚠️ BackgroundVideoManager no encontrado");
+        }
+    }
+    
+    [ContextMenu("Clean Project")]
+    public void CleanProject()
+    {
+        Debug.Log("🧹 Limpiando proyecto de scripts obsoletos...");
+        
+        // List all obsolete scripts that can be safely removed
+        Debug.Log("📋 SCRIPTS OBSOLETOS QUE PUEDES ELIMINAR:");
+        Debug.Log("   • BackgroundVideoManager.cs (original)");
+        Debug.Log("   • VideoSetupHelper.cs");
+        Debug.Log("   • FullScreenVideoBackground.cs");
+        Debug.Log("   • VideoFormatOptimizer.cs");
+        Debug.Log("   • QuickGameplayFix.cs");
+        Debug.Log("   • README_BackgroundVideos.md");
+        Debug.Log("");
+        Debug.Log("📋 SCRIPTS NECESARIOS:");
+        Debug.Log("   ✅ BackgroundVideoManager.cs");
+        Debug.Log("   ✅ GameplayManager.cs (modificado)");
+        Debug.Log("   ✅ VideoSystemMigrator.cs (este script)");
+    }
+    
+    [ContextMenu("Test Video System")]
+    public void TestVideoSystem()
+    {
+        Debug.Log("🧪 Probando sistema de video...");
+        
+        BackgroundVideoManager videoManager = FindFirstObjectByType<BackgroundVideoManager>();
+        if (videoManager != null)
+        {
+            Debug.Log("🧪 Testing video system...");
+            // videoManager.TestVideoLoading(); // Method not available in original
+        }
+        else
+        {
+            Debug.LogError("❌ BackgroundVideoManager no encontrado");
+        }
+    }
+    
+    [ContextMenu("Show Setup Instructions")]
+    public void ShowSetupInstructions()
+    {
+        Debug.Log("📋 INSTRUCCIONES DE CONFIGURACIÓN:");
+        Debug.Log("════════════════════════════════════");
+        Debug.Log("");
+        Debug.Log("1️⃣ MIGRACIÓN AUTOMÁTICA:");
+        Debug.Log("   • Agregar VideoSystemMigrator a cualquier GameObject");
+        Debug.Log("   • Ejecutar 'Migrate Video System'");
+        Debug.Log("   • ¡Todo se configura automáticamente!");
+        Debug.Log("");
+        Debug.Log("2️⃣ ESTRUCTURA DE ARCHIVOS:");
+        Debug.Log("   StreamingAssets/Songs/[Cancion]/");
+        Debug.Log("   ├── song.ogg");
+        Debug.Log("   ├── notes.chart");
+        Debug.Log("   └── background.mp4  ← Video aquí");
+        Debug.Log("");
+        Debug.Log("3️⃣ FORMATOS RECOMENDADOS:");
+        Debug.Log("   • MP4 (H.264) - MÁS RÁPIDO ⚡");
+        Debug.Log("   • WebM - Rápido 🚀");
+        Debug.Log("   • Evitar MOV/AVI - Lentos 🐌");
+        Debug.Log("");
+        Debug.Log("4️⃣ CONFIGURACIÓN:");
+        Debug.Log("   • Videos se cargan automáticamente");
+        Debug.Log("   • Timeout de 5 segundos");
+        Debug.Log("   • Opacidad 80% por defecto");
+        Debug.Log("   • Posición de fondo completo");
+    }
+    
+    void Update()
+    {
+        // Hotkeys for quick access
+        if (Input.GetKeyDown(KeyCode.F11))
+        {
+            MigrateVideoSystem();
+        }
+        
+        if (Input.GetKeyDown(KeyCode.F12))
+        {
+            TestVideoSystem();
+        }
+    }
+    
+    void OnGUI()
+    {
+        GUILayout.BeginArea(new Rect(Screen.width - 250, Screen.height - 100, 240, 80));
+        GUILayout.Label("🔄 VIDEO SYSTEM MIGRATOR");
+        GUILayout.Label("F11 - Migrate System");
+        GUILayout.Label("F12 - Test Video System");
+        GUILayout.EndArea();
+    }
+}

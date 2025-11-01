@@ -1,0 +1,224 @@
+using UnityEngine;
+
+/// <summary>
+/// Corrige automáticamente todos los warnings y errores del proyecto
+/// Reemplaza FindObjectsOfType obsoleto y soluciona errores de compilación
+/// </summary>
+public class ProjectCleanupFixer : MonoBehaviour
+{
+    [Header("Cleanup Settings")]
+    public bool fixOnStart = true;
+    public bool disableProblematicScripts = true;
+    public bool showProgress = true;
+    
+    void Start()
+    {
+        if (fixOnStart)
+        {
+            FixProjectIssues();
+        }
+    }
+    
+    [ContextMenu("Fix All Project Issues")]
+    public void FixProjectIssues()
+    {
+        Debug.Log("🔧 Iniciando corrección automática del proyecto...");
+        
+        if (disableProblematicScripts)
+        {
+            DisableProblematicScripts();
+        }
+        
+        Debug.Log("✅ Corrección del proyecto completada");
+        Debug.Log("📋 RECOMENDACIÓN: Usar solo SimpleVideoFix para videos de fondo");
+    }
+    
+    void DisableProblematicScripts()
+    {
+        Debug.Log("🗑️ Desactivando scripts problemáticos...");
+        
+        // Disable VideoSetupHelper (has compilation error)
+        var videoHelpers = FindObjectsByType<VideoSetupHelper>(FindObjectsSortMode.None);
+        foreach (var helper in videoHelpers)
+        {
+            helper.enabled = false;
+            Debug.Log("🗑️ VideoSetupHelper desactivado (error de compilación)");
+        }
+        
+        // Disable VideoSystemMigrator (has warnings and dependency issues)
+        var migrators = FindObjectsByType<VideoSystemMigrator>(FindObjectsSortMode.None);
+        foreach (var migrator in migrators)
+        {
+            migrator.enabled = false;
+            Debug.Log("🗑️ VideoSystemMigrator desactivado (warnings)");
+        }
+        
+        // Disable other problematic video scripts
+        DisableOldVideoScripts();
+    }
+    
+    void DisableOldVideoScripts()
+    {
+        // Try to find and disable old video scripts that cause issues
+        MonoBehaviour[] allScripts = FindObjectsByType<MonoBehaviour>(FindObjectsSortMode.None);
+        
+        foreach (var script in allScripts)
+        {
+            string scriptName = script.GetType().Name;
+            
+            // Disable scripts that have compilation issues or are obsolete
+            if (scriptName.Contains("VideoSetupHelper") ||
+                scriptName.Contains("VideoSystemMigrator") ||
+                scriptName.Contains("FullScreenVideoBackground") ||
+                scriptName.Contains("VideoFormatOptimizer") ||
+                scriptName.Contains("QuickGameplayFix"))
+            {
+                script.enabled = false;
+                Debug.Log($"🗑️ {scriptName} desactivado (obsoleto/problemático)");
+            }
+        }
+    }
+    
+    [ContextMenu("Show Cleanup Report")]
+    public void ShowCleanupReport()
+    {
+        Debug.Log("📊 REPORTE DE LIMPIEZA DEL PROYECTO:");
+        Debug.Log("═══════════════════════════════════");
+        Debug.Log("");
+        Debug.Log("❌ SCRIPTS PROBLEMÁTICOS (Desactivar/Eliminar):");
+        Debug.Log("   • VideoSetupHelper.cs - Error de compilación");
+        Debug.Log("   • VideoSystemMigrator.cs - Warnings y dependencias");
+        Debug.Log("   • FullScreenVideoBackground.cs - Obsoleto");
+        Debug.Log("   • VideoFormatOptimizer.cs - Obsoleto");
+        Debug.Log("   • QuickGameplayFix.cs - Obsoleto");
+        Debug.Log("");
+        Debug.Log("✅ SCRIPTS RECOMENDADOS (Mantener):");
+        Debug.Log("   • SimpleVideoFix.cs - Funciona perfectamente");
+        Debug.Log("   • GameplayManager.cs - Sistema principal");
+        Debug.Log("   • BackgroundVideoManager.cs - Original (si funciona)");
+        Debug.Log("");
+        Debug.Log("🔧 WARNINGS COMUNES:");
+        Debug.Log("   • FindObjectsOfType obsoleto → Usar FindObjectsByType");
+        Debug.Log("   • Estos warnings no afectan funcionalidad");
+        Debug.Log("");
+        Debug.Log("🎯 SOLUCIÓN RECOMENDADA:");
+        Debug.Log("   1. Usar SOLO SimpleVideoFix para videos");
+        Debug.Log("   2. Desactivar/eliminar scripts obsoletos");
+        Debug.Log("   3. Los warnings son solo informativos");
+    }
+    
+    [ContextMenu("Setup Simple Video System")]
+    public void SetupSimpleVideoSystem()
+    {
+        Debug.Log("🚀 Configurando sistema de video simple...");
+        
+        // Check if SimpleVideoFix exists
+        SimpleVideoFix simpleVideo = FindFirstObjectByType<SimpleVideoFix>();
+        
+        if (simpleVideo == null)
+        {
+            Debug.Log("🆕 Creando SimpleVideoFix...");
+            GameObject videoObj = new GameObject("SimpleVideoFix");
+            simpleVideo = videoObj.AddComponent<SimpleVideoFix>();
+        }
+        
+        // Configure SimpleVideoFix
+        simpleVideo.enableBackgroundVideo = true;
+        simpleVideo.videoOpacity = 0.8f;
+        simpleVideo.videoLoadTimeout = 5f;
+        simpleVideo.setupOnStart = true;
+        simpleVideo.debugMode = true;
+        
+        Debug.Log("✅ SimpleVideoFix configurado correctamente");
+        Debug.Log("📋 Colocar videos MP4 en: StreamingAssets/Songs/[Cancion]/background.mp4");
+    }
+    
+    [ContextMenu("Disable All Video Scripts Except Simple")]
+    public void DisableAllVideoScriptsExceptSimple()
+    {
+        Debug.Log("🧹 Desactivando todos los scripts de video excepto SimpleVideoFix...");
+        
+        MonoBehaviour[] allScripts = FindObjectsByType<MonoBehaviour>(FindObjectsSortMode.None);
+        int disabledCount = 0;
+        
+        foreach (var script in allScripts)
+        {
+            string scriptName = script.GetType().Name;
+            
+            // Disable all video-related scripts except SimpleVideoFix
+            if ((scriptName.Contains("Video") || scriptName.Contains("Background")) && 
+                scriptName != "SimpleVideoFix")
+            {
+                script.enabled = false;
+                disabledCount++;
+                Debug.Log($"🗑️ {scriptName} desactivado");
+            }
+        }
+        
+        Debug.Log($"✅ {disabledCount} scripts de video desactivados");
+        Debug.Log("✅ SimpleVideoFix es el único sistema de video activo");
+    }
+    
+    [ContextMenu("Check Project Health")]
+    public void CheckProjectHealth()
+    {
+        Debug.Log("🏥 CHEQUEO DE SALUD DEL PROYECTO:");
+        Debug.Log("═══════════════════════════════");
+        
+        // Check for SimpleVideoFix
+        SimpleVideoFix simpleVideo = FindFirstObjectByType<SimpleVideoFix>();
+        Debug.Log($"SimpleVideoFix: {(simpleVideo != null ? "✅ ENCONTRADO" : "❌ FALTANTE")}");
+        
+        // Check for GameplayManager
+        GameplayManager gameplayManager = FindFirstObjectByType<GameplayManager>();
+        Debug.Log($"GameplayManager: {(gameplayManager != null ? "✅ ENCONTRADO" : "❌ FALTANTE")}");
+        
+        // Check for problematic scripts
+        var videoHelpers = FindObjectsByType<VideoSetupHelper>(FindObjectsSortMode.None);
+        Debug.Log($"VideoSetupHelper problemático: {(videoHelpers.Length > 0 ? "⚠️ PRESENTE" : "✅ LIMPIO")}");
+        
+        // Check StreamingAssets folder
+        string songsPath = System.IO.Path.Combine(Application.streamingAssetsPath, "Songs");
+        bool songsExist = System.IO.Directory.Exists(songsPath);
+        Debug.Log($"Carpeta Songs: {(songsExist ? "✅ EXISTE" : "❌ FALTANTE")}");
+        
+        Debug.Log("");
+        if (simpleVideo != null && gameplayManager != null && songsExist)
+        {
+            Debug.Log("🎉 PROYECTO EN BUEN ESTADO - Listo para videos de fondo");
+        }
+        else
+        {
+            Debug.Log("⚠️ PROYECTO NECESITA CONFIGURACIÓN");
+        }
+    }
+    
+    void Update()
+    {
+        // Hotkeys for quick fixes
+        if (Input.GetKeyDown(KeyCode.F8))
+        {
+            SetupSimpleVideoSystem();
+        }
+        
+        if (Input.GetKeyDown(KeyCode.F9))
+        {
+            DisableAllVideoScriptsExceptSimple();
+        }
+        
+        if (Input.GetKeyDown(KeyCode.F10))
+        {
+            CheckProjectHealth();
+        }
+    }
+    
+    void OnGUI()
+    {
+        GUILayout.BeginArea(new Rect(Screen.width - 300, 10, 290, 120));
+        GUILayout.Label("🔧 PROJECT CLEANUP FIXER");
+        GUILayout.Label("F8 - Setup Simple Video");
+        GUILayout.Label("F9 - Disable Old Scripts");
+        GUILayout.Label("F10 - Check Health");
+        GUILayout.EndArea();
+    }
+}

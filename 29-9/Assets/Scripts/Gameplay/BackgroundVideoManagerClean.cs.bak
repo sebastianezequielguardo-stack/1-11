@@ -1,0 +1,408 @@
+using UnityEngine;
+using UnityEngine.Video;
+using System.IO;
+using System.Collections;
+
+/// <summary>
+/// Sistema limpio y optimizado para videos de fondo
+/// Reemplaza todos los scripts de video anteriores
+/// </summary>
+public class BackgroundVideoManagerClean : MonoBehaviour
+{
+    [Header("Video Configuration")]
+    public bool enableBackgroundVideo = true;
+    [Range(0.1f, 1.0f)]
+    public float videoOpacity = 0.8f;
+    public float videoLoadTimeout = 5f;
+    
+    [Header("Full Screen Setup")]
+    public Vector3 videoPosition = new Vector3(0f, 0f, 100f);
+    public Vector3 videoScale = new Vector3(60f, 40f, 1f);
+    
+    [Header("Auto Setup")]
+    public bool autoSetupOnStart = true;
+    public bool debugMode = false;
+    
+    // Components
+    private VideoPlayer videoPlayer;
+    private RenderTexture videoRenderTexture;
+    private GameObject videoQuad;
+    private Material videoMaterial;
+    
+    // State
+    private bool videoLoaded = false;
+    private bool isLoading = false;
+    
+    // Supported formats in order of speed (fastest first)
+    private string[] supportedFormats = { ".mp4", ".webm", ".mov", ".avi" };
+    
+    void Start()
+    {
+        if (autoSetupOnStart)
+        {
+            SetupVideoSystem();
+        }
+    }
+    
+    [ContextMenu("Setup Video System")]
+    public void SetupVideoSystem()
+    {
+        CreateVideoPlayer();
+        CreateRenderTexture();
+        CreateVideoQuad();
+        SetupVideoMaterial();
+        
+        if (debugMode)
+            Debug.Log("🎬 Background Video System initialized");
+    }
+    
+    void CreateVideoPlayer()
+    {
+        if (videoPlayer == null)
+        {
+            GameObject playerObj = new GameObject("VideoPlayer");
+            playerObj.transform.SetParent(transform);
+            videoPlayer = playerObj.AddComponent<VideoPlayer>();
+        }
+        
+        // Optimal settings for fast loading
+        videoPlayer.renderMode = VideoRenderMode.RenderTexture;
+        videoPlayer.isLooping = true;
+        videoPlayer.playOnAwake = false;
+        videoPlayer.audioOutputMode = VideoAudioOutputMode.None;
+        videoPlayer.skipOnDrop = true; // Skip frames if needed for performance
+        
+        // Events
+        videoPlayer.prepareCompleted += OnVideoPrepared;
+        videoPlayer.errorReceived += OnVideoError;
+    }
+    
+    void CreateRenderTexture()
+    {
+        if (videoRenderTexture == null)
+        {
+            videoRenderTexture = new RenderTexture(1920, 1080, 0);
+            videoRenderTexture.Create();
+        }
+        
+        videoPlayer.targetTexture = videoRenderTexture;
+    }
+    
+    void CreateVideoQuad()
+    {
+        if (videoQuad == null)
+        {
+            videoQuad = GameObject.CreatePrimitive(PrimitiveType.Quad);
+            videoQuad.name = "BackgroundVideoQuad";
+            videoQuad.transform.SetParent(transform);
+            
+            // Remove collider
+            DestroyImmediate(videoQuad.GetComponent<Collider>());
+        }
+        
+        // Position for full screen background
+        videoQuad.transform.position = videoPosition;
+        videoQuad.transform.localScale = videoScale;
+        videoQuad.transform.rotation = Quaternion.identity;
+        
+        // Initially hidden
+        videoQuad.SetActive(false);
+    }
+    
+    void SetupVideoMaterial()
+    {
+        videoMaterial = new Material(Shader.Find("Unlit/Texture"));
+        videoMaterial.mainTexture = videoRenderTexture;
+        videoMaterial.renderQueue = 1000; // Render first (background)
+        
+        // Apply opacity
+        Color color = videoMaterial.color;
+        color.a = videoOpacity;
+        videoMaterial.color = color;
+        
+        // Apply to quad
+        Renderer renderer = videoQuad.GetComponent<Renderer>();
+        if (renderer != null)
+        {
+            renderer.material = videoMaterial;
+            renderer.sortingOrder = -100; // Render behind everything
+        }
+    }
+    
+    /// <summary>
+    /// Load video for current song (called by GameplayManager)
+    /// </summary>
+    public void LoadSongVideo(string songFolderPath)
+    {
+        if (!enableBackgroundVideo || isLoading)
+            return;
+            
+        StartCoroutine(LoadVideoAsync(songFolderPath));
+    }
+    
+    IEnumerator LoadVideoAsync(string songFolderPath)
+    {
+        isLoading = true;
+        videoLoaded = false;
+        
+        // Find video file
+        string videoPath = FindBestVideoFile(songFolderPath);
+        
+        if (string.IsNullOrEmpty(videoPath))
+        {
+            if (debugMode)
+                Debug.Log($"🎬 No video found in: {songFolderPath}");
+            isLoading = false;
+            yield break;
+        }
+        
+        if (debugMode)
+            Debug.Log($"🎬 Loading video: {Path.GetFileName(videoPath)}");
+        
+        // Load with timeout
+        yield return StartCoroutine(LoadVideoWithTimeout(videoPath));
+        
+        isLoading = false;
+    }
+    
+    IEnumerator LoadVideoWithTimeout(string videoPath)
+    {
+        // Start loading
+        try
+        {
+            videoPlayer.url = "file://" + videoPath.Replace("\\", "/");
+            videoPlayer.Prepare();
+        }
+        catch (System.Exception e)
+        {
+            if (debugMode)
+                Debug.LogError($"🎬 Error loading video: {e.Message}");
+            yield break;
+        }
+        
+        // Wait with timeout
+        float timer = 0f;
+        while (!videoLoaded && timer < videoLoadTimeout)
+        {
+            timer += Time.deltaTime;
+            yield return null;
+        }
+        
+        // Timeout handling
+        if (!videoLoaded && timer >= videoLoadTimeout)
+        {
+            if (debugMode)
+                Debug.LogWarning($"🎬 Video loading timeout ({videoLoadTimeout}s)");
+            HideVideo();
+        }
+    }
+    
+    string FindBestVideoFile(string songFolderPath)
+    {
+        if (!Directory.Exists(songFolderPath))
+            return null;
+        
+        // Search by format priority (fastest first)
+        foreach (string format in supportedFormats)
+        {
+            string[] files = Directory.GetFiles(songFolderPath, "*" + format);
+            if (files.Length > 0)
+            {
+                return files[0];
+            }
+        }
+        
+        // Search common names
+        string[] commonNames = { "background", "video", "bg", "movie" };
+        foreach (string name in commonNames)
+        {
+            foreach (string format in supportedFormats)
+            {
+                string path = Path.Combine(songFolderPath, name + format);
+                if (File.Exists(path))
+                {
+                    return path;
+                }
+            }
+        }
+        
+        return null;
+    }
+    
+    void OnVideoPrepared(VideoPlayer player)
+    {
+        videoLoaded = true;
+        ShowVideo();
+        
+        // Auto-start if gameplay is active
+        if (IsGameplayActive())
+        {
+            PlayVideo();
+        }
+        
+        if (debugMode)
+            Debug.Log("🎬 Video prepared and ready");
+    }
+    
+    void OnVideoError(VideoPlayer player, string message)
+    {
+        if (debugMode)
+            Debug.LogError($"🎬 Video error: {message}");
+        HideVideo();
+    }
+    
+    bool IsGameplayActive()
+    {
+        GameplayManager gm = FindFirstObjectByType<GameplayManager>();
+        return gm != null && gm.isGameActive;
+    }
+    
+    /// <summary>
+    /// Control methods for GameplayManager
+    /// </summary>
+    public void PlayVideo()
+    {
+        if (videoPlayer != null && videoLoaded && enableBackgroundVideo)
+        {
+            videoPlayer.Play();
+            ShowVideo();
+        }
+    }
+    
+    public void PauseVideo()
+    {
+        if (videoPlayer != null && videoPlayer.isPlaying)
+        {
+            videoPlayer.Pause();
+        }
+    }
+    
+    public void StopVideo()
+    {
+        if (videoPlayer != null)
+        {
+            videoPlayer.Stop();
+            HideVideo();
+        }
+    }
+    
+    public void ShowVideo()
+    {
+        if (videoQuad != null)
+        {
+            videoQuad.SetActive(true);
+        }
+    }
+    
+    public void HideVideo()
+    {
+        if (videoQuad != null)
+        {
+            videoQuad.SetActive(false);
+        }
+    }
+    
+    /// <summary>
+    /// Configuration methods
+    /// </summary>
+    public void SetVideoOpacity(float opacity)
+    {
+        videoOpacity = Mathf.Clamp01(opacity);
+        if (videoMaterial != null)
+        {
+            Color color = videoMaterial.color;
+            color.a = videoOpacity;
+            videoMaterial.color = color;
+        }
+    }
+    
+    public void EnableVideo(bool enable)
+    {
+        enableBackgroundVideo = enable;
+        if (!enable)
+        {
+            StopVideo();
+        }
+    }
+    
+    /// <summary>
+    /// Sync with gameplay state
+    /// </summary>
+    void Update()
+    {
+        if (!enableBackgroundVideo) return;
+        
+        GameplayManager gm = FindFirstObjectByType<GameplayManager>();
+        if (gm == null) return;
+        
+        // Auto sync with gameplay
+        if (gm.isGameActive && !gm.isPaused)
+        {
+            if (videoLoaded && !videoPlayer.isPlaying)
+            {
+                PlayVideo();
+            }
+        }
+        else if (gm.isPaused)
+        {
+            if (videoPlayer.isPlaying)
+            {
+                PauseVideo();
+            }
+        }
+    }
+    
+    /// <summary>
+    /// Cleanup
+    /// </summary>
+    void OnDestroy()
+    {
+        if (videoPlayer != null)
+        {
+            videoPlayer.prepareCompleted -= OnVideoPrepared;
+            videoPlayer.errorReceived -= OnVideoError;
+        }
+        
+        if (videoRenderTexture != null)
+        {
+            videoRenderTexture.Release();
+        }
+    }
+    
+    /// <summary>
+    /// Debug and testing
+    /// </summary>
+    [ContextMenu("Test Video Loading")]
+    public void TestVideoLoading()
+    {
+        if (GameManager.Instance?.selectedSongPath != null)
+        {
+            string songFolder = Path.Combine(Application.streamingAssetsPath, "Songs", GameManager.Instance.selectedSongPath);
+            LoadSongVideo(songFolder);
+        }
+        else
+        {
+            Debug.LogWarning("⚠️ No song selected for testing");
+        }
+    }
+    
+    [ContextMenu("Toggle Video")]
+    public void ToggleVideo()
+    {
+        EnableVideo(!enableBackgroundVideo);
+        Debug.Log($"🎬 Videos {(enableBackgroundVideo ? "ENABLED" : "DISABLED")}");
+    }
+    
+    void OnGUI()
+    {
+        if (!debugMode) return;
+        
+        GUILayout.BeginArea(new Rect(10, 10, 300, 120));
+        GUILayout.Label("🎬 BACKGROUND VIDEO MANAGER");
+        GUILayout.Label($"Status: {(enableBackgroundVideo ? "ENABLED" : "DISABLED")}");
+        GUILayout.Label($"Loaded: {(videoLoaded ? "YES" : "NO")}");
+        GUILayout.Label($"Playing: {(videoPlayer?.isPlaying == true ? "YES" : "NO")}");
+        GUILayout.Label($"Loading: {(isLoading ? "YES" : "NO")}");
+        GUILayout.EndArea();
+    }
+}

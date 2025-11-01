@@ -1,0 +1,219 @@
+using UnityEngine;
+
+/// <summary>
+/// Configura el video de fondo para que cubra toda la pantalla
+/// como en YouTube, con el highway renderizado encima
+/// </summary>
+public class FullScreenVideoBackground : MonoBehaviour
+{
+    [Header("Full Screen Video Settings")]
+    public bool setupOnStart = true;
+    public bool adjustToScreenSize = true;
+    
+    [Header("Video Background Configuration")]
+    [Range(0.3f, 1.0f)]
+    public float backgroundDimming = 0.8f; // Oscurecer el video para mejor visibilidad del highway
+    public bool stretchToFitScreen = true;
+    
+    private BackgroundVideoManager videoManager;
+    private Camera mainCamera;
+    
+    void Start()
+    {
+        if (setupOnStart)
+        {
+            SetupFullScreenVideo();
+        }
+    }
+    
+    [ContextMenu("Setup Full Screen Video")]
+    public void SetupFullScreenVideo()
+    {
+        FindComponents();
+        ConfigureVideoAsBackground();
+        AdjustCameraSettings();
+        
+        Debug.Log("🎬 Video configurado como fondo de pantalla completa");
+    }
+    
+    void FindComponents()
+    {
+        // Find video manager
+        videoManager = FindFirstObjectByType<BackgroundVideoManager>();
+        if (videoManager == null)
+        {
+            Debug.LogWarning("⚠️ BackgroundVideoManager no encontrado");
+            return;
+        }
+        
+        // Find main camera
+        mainCamera = Camera.main;
+        if (mainCamera == null)
+        {
+            mainCamera = FindFirstObjectByType<Camera>();
+        }
+    }
+    
+    void ConfigureVideoAsBackground()
+    {
+        if (videoManager == null) return;
+        
+        // Configure video settings for full screen background
+        videoManager.enableBackgroundVideo = true;
+        videoManager.videoOpacity = backgroundDimming;
+        
+        // Position video far behind everything
+        videoManager.videoPosition = new Vector3(0f, 0f, 100f);
+        
+        // Calculate screen coverage
+        if (adjustToScreenSize && mainCamera != null)
+        {
+            CalculateScreenCoverage();
+        }
+        else
+        {
+            // Default large size to cover screen
+            videoManager.videoScale = new Vector3(60f, 40f, 1f);
+        }
+        
+        Debug.Log($"🎬 Video configurado - Posición: {videoManager.videoPosition}, Escala: {videoManager.videoScale}");
+    }
+    
+    void CalculateScreenCoverage()
+    {
+        if (mainCamera == null || videoManager == null) return;
+        
+        // Calculate the size needed to cover the entire screen at the video's Z position
+        float distance = Mathf.Abs(videoManager.videoPosition.z - mainCamera.transform.position.z);
+        float height = 2.0f * distance * Mathf.Tan(mainCamera.fieldOfView * 0.5f * Mathf.Deg2Rad);
+        float width = height * mainCamera.aspect;
+        
+        // Add extra margin to ensure full coverage
+        width *= 1.2f;
+        height *= 1.2f;
+        
+        videoManager.videoScale = new Vector3(width, height, 1f);
+        
+        Debug.Log($"🎬 Cobertura calculada - Ancho: {width:F1}, Alto: {height:F1}");
+    }
+    
+    void AdjustCameraSettings()
+    {
+        if (mainCamera == null) return;
+        
+        // Ensure camera can see the video background
+        if (mainCamera.farClipPlane < 150f)
+        {
+            mainCamera.farClipPlane = 150f;
+            Debug.Log("📷 Far clip plane ajustado para ver el video de fondo");
+        }
+        
+        // Set clear flags to solid color or skybox to avoid conflicts
+        if (mainCamera.clearFlags == CameraClearFlags.Nothing)
+        {
+            mainCamera.clearFlags = CameraClearFlags.SolidColor;
+            mainCamera.backgroundColor = Color.black;
+            Debug.Log("📷 Camera clear flags ajustados");
+        }
+    }
+    
+    [ContextMenu("Test Video Positioning")]
+    public void TestVideoPositioning()
+    {
+        if (videoManager == null)
+        {
+            FindComponents();
+        }
+        
+        if (videoManager?.videoQuad != null)
+        {
+            // Temporarily make video visible for testing
+            Renderer renderer = videoManager.videoQuad.GetComponent<Renderer>();
+            if (renderer != null)
+            {
+                // Create a test material to visualize positioning
+                Material testMat = new Material(Shader.Find("Unlit/Color"));
+                testMat.color = new Color(1f, 0f, 1f, 0.5f); // Magenta semi-transparent
+                renderer.material = testMat;
+                
+                Debug.Log("🎬 Video quad temporalmente visible en magenta para testing");
+            }
+        }
+    }
+    
+    [ContextMenu("Apply YouTube Style")]
+    public void ApplyYouTubeStyle()
+    {
+        if (videoManager == null) return;
+        
+        // YouTube-like configuration
+        videoManager.videoOpacity = 0.9f; // Slightly dimmed
+        videoManager.videoPosition = new Vector3(0f, 0f, 80f);
+        
+        if (adjustToScreenSize)
+        {
+            CalculateScreenCoverage();
+        }
+        else
+        {
+            videoManager.videoScale = new Vector3(50f, 35f, 1f);
+        }
+        
+        Debug.Log("🎬 Estilo YouTube aplicado - Video como fondo completo");
+    }
+    
+    [ContextMenu("Apply Clone Hero Style")]
+    public void ApplyCloneHeroStyle()
+    {
+        if (videoManager == null) return;
+        
+        // Clone Hero-like configuration (more dimmed)
+        videoManager.videoOpacity = 0.6f; // More dimmed for better note visibility
+        videoManager.videoPosition = new Vector3(0f, 0f, 90f);
+        
+        if (adjustToScreenSize)
+        {
+            CalculateScreenCoverage();
+        }
+        else
+        {
+            videoManager.videoScale = new Vector3(55f, 40f, 1f);
+        }
+        
+        Debug.Log("🎬 Estilo Clone Hero aplicado - Video dimmed para mejor visibilidad");
+    }
+    
+    void Update()
+    {
+        // Hotkeys for quick testing
+        if (Input.GetKeyDown(KeyCode.F1))
+        {
+            ApplyYouTubeStyle();
+        }
+        
+        if (Input.GetKeyDown(KeyCode.F2))
+        {
+            ApplyCloneHeroStyle();
+        }
+        
+        if (Input.GetKeyDown(KeyCode.F3))
+        {
+            TestVideoPositioning();
+        }
+    }
+    
+    void OnGUI()
+    {
+        if (!setupOnStart) return;
+        
+        GUILayout.BeginArea(new Rect(10, Screen.height - 200, 300, 180));
+        GUILayout.Label("🎬 FULL SCREEN VIDEO BACKGROUND");
+        GUILayout.Label($"Dimming: {backgroundDimming:F1}");
+        GUILayout.Label($"Video Manager: {(videoManager != null ? "✅" : "❌")}");
+        GUILayout.Label("");
+        GUILayout.Label("F1 - YouTube Style");
+        GUILayout.Label("F2 - Clone Hero Style");
+        GUILayout.Label("F3 - Test Positioning");
+        GUILayout.EndArea();
+    }
+}

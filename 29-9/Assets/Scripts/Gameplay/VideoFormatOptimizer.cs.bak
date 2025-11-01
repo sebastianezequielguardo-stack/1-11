@@ -1,0 +1,228 @@
+using UnityEngine;
+using UnityEngine.Video;
+using System.IO;
+
+/// <summary>
+/// Optimiza la carga de videos según el formato para máxima velocidad
+/// </summary>
+public class VideoFormatOptimizer : MonoBehaviour
+{
+    [Header("Format Optimization")]
+    public bool optimizeByFormat = true;
+    public bool preferFasterFormats = true;
+    
+    [Header("Format Priority (Fastest to Slowest)")]
+    public string[] formatPriority = { ".mp4", ".webm", ".mov", ".avi" };
+    
+    [Header("Loading Optimization")]
+    public bool useHardwareDecoding = true;
+    public bool preloadVideo = false;
+    public VideoRenderMode optimizedRenderMode = VideoRenderMode.RenderTexture;
+    
+    private BackgroundVideoManager videoManager;
+    
+    void Start()
+    {
+        videoManager = GetComponent<BackgroundVideoManager>();
+        if (videoManager != null && optimizeByFormat)
+        {
+            OptimizeVideoSettings();
+        }
+    }
+    
+    [ContextMenu("Optimize Video Settings")]
+    public void OptimizeVideoSettings()
+    {
+        if (videoManager?.videoPlayer == null) return;
+        
+        VideoPlayer player = videoManager.videoPlayer;
+        
+        // Configuración optimizada para velocidad
+        player.renderMode = optimizedRenderMode;
+        player.skipOnDrop = true; // Saltar frames si es necesario
+        player.playOnAwake = false;
+        
+        // Optimización de audio (desactivado para velocidad)
+        player.audioOutputMode = VideoAudioOutputMode.None;
+        
+        Debug.Log("🚀 Video player optimizado para velocidad de carga");
+    }
+    
+    /// <summary>
+    /// Encuentra el video con el formato más rápido disponible
+    /// </summary>
+    public string FindFastestVideoFormat(string songFolderPath)
+    {
+        if (!Directory.Exists(songFolderPath))
+        {
+            return null;
+        }
+        
+        // Buscar en orden de prioridad (más rápido primero)
+        foreach (string format in formatPriority)
+        {
+            string[] files = Directory.GetFiles(songFolderPath, "*" + format);
+            if (files.Length > 0)
+            {
+                string selectedFile = files[0];
+                LogFormatInfo(selectedFile, format);
+                return selectedFile;
+            }
+        }
+        
+        // Buscar nombres comunes con formatos rápidos
+        string[] commonNames = { "background", "video", "bg", "movie" };
+        foreach (string name in commonNames)
+        {
+            foreach (string format in formatPriority)
+            {
+                string videoPath = Path.Combine(songFolderPath, name + format);
+                if (File.Exists(videoPath))
+                {
+                    LogFormatInfo(videoPath, format);
+                    return videoPath;
+                }
+            }
+        }
+        
+        return null;
+    }
+    
+    void LogFormatInfo(string videoPath, string format)
+    {
+        string speedRating = GetSpeedRating(format);
+        Debug.Log($"🎬 Video encontrado: {Path.GetFileName(videoPath)} - Formato: {format} {speedRating}");
+    }
+    
+    string GetSpeedRating(string format)
+    {
+        switch (format.ToLower())
+        {
+            case ".mp4":
+                return "⚡ (MÁS RÁPIDO)";
+            case ".webm":
+                return "🚀 (RÁPIDO)";
+            case ".mov":
+                return "🐌 (LENTO)";
+            case ".avi":
+                return "🐢 (MUY LENTO)";
+            default:
+                return "❓ (DESCONOCIDO)";
+        }
+    }
+    
+    [ContextMenu("Analyze Song Videos")]
+    public void AnalyzeSongVideos()
+    {
+        string songsPath = Path.Combine(Application.streamingAssetsPath, "Songs");
+        
+        if (!Directory.Exists(songsPath))
+        {
+            Debug.LogWarning("📁 Carpeta Songs no encontrada");
+            return;
+        }
+        
+        Debug.Log("📊 ANÁLISIS DE FORMATOS DE VIDEO:");
+        Debug.Log("════════════════════════════════════");
+        
+        string[] songFolders = Directory.GetDirectories(songsPath);
+        int mp4Count = 0, webmCount = 0, movCount = 0, aviCount = 0;
+        
+        foreach (string folder in songFolders)
+        {
+            string songName = Path.GetFileName(folder);
+            string fastestVideo = FindFastestVideoFormat(folder);
+            
+            if (!string.IsNullOrEmpty(fastestVideo))
+            {
+                string extension = Path.GetExtension(fastestVideo).ToLower();
+                string speedInfo = GetSpeedRating(extension);
+                
+                Debug.Log($"🎵 {songName}: {Path.GetFileName(fastestVideo)} {speedInfo}");
+                
+                // Contar formatos
+                switch (extension)
+                {
+                    case ".mp4": mp4Count++; break;
+                    case ".webm": webmCount++; break;
+                    case ".mov": movCount++; break;
+                    case ".avi": aviCount++; break;
+                }
+            }
+            else
+            {
+                Debug.Log($"🎵 {songName}: ❌ Sin video");
+            }
+        }
+        
+        Debug.Log("\n📈 RESUMEN DE FORMATOS:");
+        Debug.Log($"   MP4 (Más rápido): {mp4Count}");
+        Debug.Log($"   WebM (Rápido): {webmCount}");
+        Debug.Log($"   MOV (Lento): {movCount}");
+        Debug.Log($"   AVI (Muy lento): {aviCount}");
+        
+        // Recomendaciones
+        if (movCount > 0 || aviCount > 0)
+        {
+            Debug.LogWarning("⚠️ RECOMENDACIÓN: Convierte los videos MOV/AVI a MP4 para carga más rápida");
+        }
+        
+        if (mp4Count == 0 && webmCount > 0)
+        {
+            Debug.Log("💡 TIP: Considera convertir algunos WebM a MP4 para máxima velocidad");
+        }
+    }
+    
+    [ContextMenu("Show Format Recommendations")]
+    public void ShowFormatRecommendations()
+    {
+        Debug.Log("🎯 RECOMENDACIONES DE FORMATO PARA VELOCIDAD:");
+        Debug.Log("═══════════════════════════════════════════");
+        Debug.Log("");
+        Debug.Log("⚡ MEJOR OPCIÓN - MP4 (H.264):");
+        Debug.Log("   • Carga MÁS RÁPIDA");
+        Debug.Log("   • Mejor compatibilidad con Unity");
+        Debug.Log("   • Decodificación por hardware");
+        Debug.Log("   • Configuración: 1080p, 30fps, 5-8 Mbps");
+        Debug.Log("");
+        Debug.Log("🚀 SEGUNDA OPCIÓN - WebM (VP8):");
+        Debug.Log("   • Carga rápida");
+        Debug.Log("   • Buena compresión");
+        Debug.Log("   • Configuración: 1080p, 30fps, 4-6 Mbps");
+        Debug.Log("");
+        Debug.Log("🐌 EVITAR - MOV/AVI:");
+        Debug.Log("   • Carga MUY LENTA");
+        Debug.Log("   • Mayor uso de CPU");
+        Debug.Log("   • Problemas de compatibilidad");
+        Debug.Log("");
+        Debug.Log("🛠️ HERRAMIENTAS DE CONVERSIÓN:");
+        Debug.Log("   • FFmpeg (gratis, línea de comandos)");
+        Debug.Log("   • HandBrake (gratis, interfaz gráfica)");
+        Debug.Log("   • Adobe Media Encoder (profesional)");
+    }
+    
+    void Update()
+    {
+        // Tecla para análisis rápido
+        if (Input.GetKeyDown(KeyCode.F9))
+        {
+            AnalyzeSongVideos();
+        }
+        
+        if (Input.GetKeyDown(KeyCode.F10))
+        {
+            ShowFormatRecommendations();
+        }
+    }
+    
+    void OnGUI()
+    {
+        if (!optimizeByFormat) return;
+        
+        GUILayout.BeginArea(new Rect(Screen.width - 300, Screen.height - 100, 290, 80));
+        GUILayout.Label("🚀 VIDEO FORMAT OPTIMIZER");
+        GUILayout.Label("F9 - Analyze video formats");
+        GUILayout.Label("F10 - Show recommendations");
+        GUILayout.EndArea();
+    }
+}
